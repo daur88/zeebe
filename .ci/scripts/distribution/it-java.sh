@@ -1,10 +1,19 @@
 #!/bin/bash -eux
 
 LIMITS_CPU=${LIMITS_CPU:-$(getconf _NPROCESSORS_ONLN)}
+FORK_COUNT=${FORK_COUNT:-}
+MAVEN_PROPERTIES=(
+  -DtestMavenId=2
+  -Dsurefire.rerunFailingTestsCount=7
+)
 tmpfile=$(mktemp)
 
+if [ ! -z "$FORK_COUNT" ]; then
+  MAVEN_PROPERTIES+=("-DforkCount=$FORK_COUNT")
+fi
+
 mvn -B -T$LIMITS_CPU -s ${MAVEN_SETTINGS_XML} test-compile -Pprepare-offline -pl qa/integration-tests -pl update-tests
-mvn -o -B --fail-never -T$LIMITS_CPU -s ${MAVEN_SETTINGS_XML} verify -P skip-unstable-ci,parallel-tests -pl qa/integration-tests -pl update-tests -DtestMavenId=2 -Dsurefire.rerunFailingTestsCount=7 | tee ${tmpfile}
+mvn -o -B --fail-never -T$LIMITS_CPU -s ${MAVEN_SETTINGS_XML} verify -P skip-unstable-ci,parallel-tests -pl qa/integration-tests -pl update-tests "${MAVEN_PROPERTIES[@]}" | tee ${tmpfile}
 
 status=${PIPESTATUS[0]}
 

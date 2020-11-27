@@ -1,9 +1,19 @@
 #!/bin/bash -eux
 
 LIMITS_CPU=${LIMITS_CPU:-$(getconf _NPROCESSORS_ONLN)}
+FORK_COUNT=${FORK_COUNT:-}
+MAVEN_PROPERTIES=(
+  -Dzeebe.it.skip
+  -DtestMavenId=1
+  -Dsurefire.rerunFailingTestsCount=7
+)
 tmpfile=$(mktemp)
 
-mvn -o -B --fail-never -T$LIMITS_CPU -s ${MAVEN_SETTINGS_XML} verify -P skip-unstable-ci,parallel-tests -Dzeebe.it.skip -DtestMavenId=1 -Dsurefire.rerunFailingTestsCount=7 | tee ${tmpfile}
+if [ ! -z "$FORK_COUNT" ]; then
+  MAVEN_PROPERTIES+=("-DforkCount=$FORK_COUNT")
+fi
+
+mvn -o -B --fail-never -T$LIMITS_CPU -s ${MAVEN_SETTINGS_XML} verify -P skip-unstable-ci,parallel-tests "${MAVEN_PROPERTIES[@]}" | tee ${tmpfile}
 
 status=${PIPESTATUS[0]}
 
