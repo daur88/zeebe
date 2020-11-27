@@ -143,6 +143,7 @@ pipeline {
                 stage('Test (Java)') {
                     environment {
                         SUREFIRE_REPORT_NAME_SUFFIX = 'java-testrun'
+                        LIMITS_CPU = 2
                     }
 
                     steps {
@@ -215,6 +216,7 @@ pipeline {
                         stage('Test') {
                             environment {
                                 SUREFIRE_REPORT_NAME_SUFFIX = 'it-testrun'
+                                LIMITS_CPU = 2
                             }
 
                             steps {

@@ -1,12 +1,9 @@
 #!/bin/bash -eux
 
-
-export JAVA_TOOL_OPTIONS="$JAVA_TOOL_OPTIONS -XX:MaxRAMFraction=$((LIMITS_CPU))"
-
+LIMITS_CPU=${LIMITS_CPU:-$(getconf _NPROCESSORS_ONLN)}
 tmpfile=$(mktemp)
 
 mvn -B -T$LIMITS_CPU -s ${MAVEN_SETTINGS_XML} test-compile -Pprepare-offline -pl qa/integration-tests -pl update-tests
-
 mvn -o -B --fail-never -T$LIMITS_CPU -s ${MAVEN_SETTINGS_XML} verify -P skip-unstable-ci,parallel-tests -pl qa/integration-tests -pl update-tests -DtestMavenId=2 -Dsurefire.rerunFailingTestsCount=7 | tee ${tmpfile}
 
 status=${PIPESTATUS[0]}

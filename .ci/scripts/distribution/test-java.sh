@@ -1,7 +1,6 @@
 #!/bin/bash -eux
 
-export JAVA_TOOL_OPTIONS="$JAVA_TOOL_OPTIONS -XX:MaxRAMFraction=$((LIMITS_CPU))"
-
+LIMITS_CPU=${LIMITS_CPU:-$(getconf _NPROCESSORS_ONLN)}
 tmpfile=$(mktemp)
 
 mvn -o -B --fail-never -T$LIMITS_CPU -s ${MAVEN_SETTINGS_XML} verify -P skip-unstable-ci,parallel-tests -Dzeebe.it.skip -DtestMavenId=1 -Dsurefire.rerunFailingTestsCount=7 | tee ${tmpfile}
