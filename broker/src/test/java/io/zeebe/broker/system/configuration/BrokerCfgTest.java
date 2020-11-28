@@ -240,16 +240,20 @@ public final class BrokerCfgTest {
     environment.put(ENV_DEBUG_EXPORTER, "true");
 
     // then
-    assertDefaultDebugLogExporter(false);
+    assertDefaultDebugLogExporter();
   }
 
   @Test
-  public void shouldEnableDebugLogExporterWithPrettyOption() {
+  public void shouldDisableDebugLogExporter() {
     // given
-    environment.put(ENV_DEBUG_EXPORTER, "pretty");
+    environment.put(ENV_DEBUG_EXPORTER, "false");
+
+    // when
+    final String exporterId = DebugLogExporter.defaultExporterId();
+    final BrokerCfg brokerCfg = TestConfigReader.readConfig("empty", environment);
 
     // then
-    assertDefaultDebugLogExporter(true);
+    assertThat(brokerCfg.getExporters()).doesNotContainKey(exporterId);
   }
 
   @Test
@@ -836,13 +840,13 @@ public final class BrokerCfgTest {
     assertThat(gatewayCfg.isEnable()).isEqualTo(enabled);
   }
 
-  private void assertDefaultDebugLogExporter(final boolean prettyPrint) {
-    assertDebugLogExporter("default", prettyPrint);
-    assertDebugLogExporter("empty", prettyPrint);
+  private void assertDefaultDebugLogExporter() {
+    assertDebugLogExporter("default");
+    assertDebugLogExporter("empty");
   }
 
-  private void assertDebugLogExporter(final String configFileName, final boolean prettyPrint) {
-    final ExporterCfg exporterCfg = DebugLogExporter.defaultConfig(prettyPrint);
+  private void assertDebugLogExporter(final String configFileName) {
+    final ExporterCfg exporterCfg = DebugLogExporter.defaultConfig();
     final BrokerCfg brokerCfg = TestConfigReader.readConfig(configFileName, environment);
 
     assertThat(brokerCfg.getExporters().values())

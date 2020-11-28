@@ -20,7 +20,7 @@ import java.util.function.Consumer;
 public final class EmbeddedBrokerConfigurator {
 
   public static final Consumer<BrokerCfg> DEBUG_EXPORTER =
-      cfg -> cfg.getExporters().put("DebugLogExporter", DebugLogExporter.defaultConfig(false));
+      cfg -> cfg.getExporters().put("DebugLogExporter", DebugLogExporter.defaultConfig());
 
   public static final Consumer<BrokerCfg> HTTP_EXPORTER =
       cfg -> cfg.getExporters().put("DebugHttpExporter", DebugHttpExporter.defaultConfig());
