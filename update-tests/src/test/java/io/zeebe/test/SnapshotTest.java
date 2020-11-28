@@ -12,7 +12,6 @@ import static io.zeebe.test.UpdateTestCaseProvider.PROCESS_ID;
 
 import io.zeebe.test.util.asserts.EitherAssert;
 import io.zeebe.util.VersionUtil;
-import java.time.Duration;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.AfterAll;
@@ -59,11 +58,7 @@ final class SnapshotTest {
     EitherAssert.assertThat(state.getPartitionsActuatorClient().takeSnapshot())
         .as("expect successful response as right member")
         .isRight();
-    assertThat(state)
-        .eventually(
-            condition ->
-                condition.atMost(Duration.ofSeconds(30)).pollInterval(Duration.ofMillis(500)))
-        .hasSnapshotAvailable(1);
+    assertThat(state).eventually().hasSnapshotAvailable(1);
 
     // perform the update
     state.close();

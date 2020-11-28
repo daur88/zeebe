@@ -103,33 +103,41 @@ public class ContainerStateAssert
 
     @Override
     public ContainerStateAssert hasCompletedProcess(final String processId) {
+      final ConditionFactory defaultConditionFactory =
+          await("has completed process " + processId)
+              .atMost(Duration.ofSeconds(10))
+              .pollInterval(Duration.ofMillis(250));
+
       conditionFactory
-          .apply(defaultConditionFactory().await("has completed process " + processId))
+          .apply(defaultConditionFactory)
           .untilAsserted(() -> ContainerStateAssert.this.hasCompletedProcess(processId));
-      return myself;
+      return ContainerStateAssert.this;
     }
 
     @Override
     public ContainerStateAssert hasSnapshotAvailable(final int partitionId) {
+      final ConditionFactory defaultConditionFactory =
+          await("has snapshot available on partition " + partitionId)
+              .atMost(Duration.ofSeconds(30))
+              .pollInterval(Duration.ofMillis(500));
+
       conditionFactory
-          .apply(
-              defaultConditionFactory().await("has snapshot available on partition " + partitionId))
+          .apply(defaultConditionFactory)
           .untilAsserted(() -> ContainerStateAssert.this.hasSnapshotAvailable(partitionId));
-      return myself;
+      return ContainerStateAssert.this;
     }
 
     @Override
     public ContainerStateAssert hasNoSnapshotAvailable(final int partitionId) {
-      conditionFactory
-          .apply(
-              defaultConditionFactory()
-                  .await("has no snapshot available on partition " + partitionId))
-          .untilAsserted(() -> ContainerStateAssert.this.hasNoSnapshotAvailable(partitionId));
-      return myself;
-    }
+      final ConditionFactory defaultConditionFactory =
+          await("has no snapshot available on partition " + partitionId)
+              .atMost(Duration.ofSeconds(10))
+              .pollInterval(Duration.ofMillis(250));
 
-    private ConditionFactory defaultConditionFactory() {
-      return await().atMost(Duration.ofSeconds(10)).pollInterval(Duration.ofMillis(250));
+      conditionFactory
+          .apply(defaultConditionFactory)
+          .untilAsserted(() -> ContainerStateAssert.this.hasNoSnapshotAvailable(partitionId));
+      return ContainerStateAssert.this;
     }
   }
 }
